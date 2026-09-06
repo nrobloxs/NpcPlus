@@ -10,6 +10,13 @@ Networker = "leifstout/networker@0.3.1"
 DataServiceTyped = "leifstout/dataservicetyped@1.0.5"
 TopbarPlus = "1foreverhd/topbarplus@3.4.0"
 ZonePlus = "bintrannz/zoneplus@9.9.9"
+GoodSignal = "stravant/goodsignal@0.3.1"
+charm = "joelbrd/charm@1.0.10"
+sift = "cometahn1042/sift@0.1.0"
+janitor = "cometahn142/janitor@0.2.0"
+React = "jsdotlua/react@17.2.1"
+ReactRoblox = "jsdotlua/react-roblox@17.2.1"
+Ripple = "littensy/ripple@0.10.2"
 
 [server-dependencies]
 ProfileService = "firebird702/profileservice@1.1.0"

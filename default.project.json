@@ -24,7 +24,6 @@
     "StarterPlayer": {
       "StarterPlayerScripts": {
         "Client": {
-          "$className": "Folder",
           "$path": "src/client"
         }
       }
