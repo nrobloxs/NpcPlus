@@ -22,8 +22,7 @@ end
 function NpcServiceServer._CreateNpc(
 	self: NpcServiceServer,
 	Identifier: string,
-	Overrides: Types.NpcOverrides?,
-	Spawn: ((Types.Npc) -> ())?
+	Overrides: Types.NpcOverrides?
 ): Types.Npc?
 	if not Profiles.IsIdentifierValid(Identifier) then
 		warn("Invalid NPC identifier: " .. Identifier)
@@ -35,39 +34,21 @@ function NpcServiceServer._CreateNpc(
 		existingNpc:Destroy()
 	end
 
-	local npc = Npc.new(Identifier, Overrides)
+	local npc: Types.Npc? = Npc.new(Identifier, Overrides)
 	if not npc then
 		return nil
 	end
 
-	if Spawn then
-		Spawn(npc)
-	else
-		npc:Spawn()
+	if not npc.Profile then
+		return
 	end
+
 	self.CreatedNpcs[Identifier] = npc
 	return npc
 end
 
 function NpcServiceServer.CreateNpc(self: NpcServiceServer, Identifier: string): Types.Npc?
 	return self:_CreateNpc(Identifier)
-end
-
-function NpcServiceServer.CreateNpcAtPart(self: NpcServiceServer, Identifier: string, Part: BasePart): Types.Npc?
-	return self:_CreateNpc(Identifier, nil, function(npc)
-		npc:SpawnAtPart(Part)
-	end)
-end
-
-function NpcServiceServer.CreateNpcInRegion(
-	self: NpcServiceServer,
-	Identifier: string,
-	Center: Vector3,
-	Size: Vector3
-): Types.Npc?
-	return self:_CreateNpc(Identifier, nil, function(npc)
-		npc:SpawnInRegion(Center, Size)
-	end)
 end
 
 function NpcServiceServer.CreateNpcGroup(self: NpcServiceServer, GroupIdentifier: string): { Types.Npc }?
@@ -98,21 +79,9 @@ function NpcServiceServer.CreateNpcGroup(self: NpcServiceServer, GroupIdentifier
 
 	for index = 1, Group.MemberQty do
 		local member = members[((index - 1) % #members) + 1]
-		local npc = Npc.new(member.ProfileIdentifier, NpcServiceUtils.mergeOverrides(Group.Overrides, member.Overrides))
-		if npc then
-			if Group.SpawnPartNames and #Group.SpawnPartNames > 0 then
-				local partName = Group.SpawnPartNames[math.random(1, #Group.SpawnPartNames)]
-				local part = NpcServiceUtils.findSpawnPart(partName)
-				if part then
-					npc:SpawnAtPart(part)
-				else
-					npc:Spawn()
-				end
-			elseif Group.SpawnRegion then
-				npc:SpawnInRegion(Group.SpawnRegion, Group.SpawnRegionSize or Vector3.zero)
-			else
-				npc:Spawn()
-			end
+		local npc: Types.Npc? =
+			Npc.new(member.ProfileIdentifier, NpcServiceUtils.mergeOverrides(Group.Overrides, member.Overrides))
+		if npc and npc.Profile then
 			table.insert(createdGroup, npc)
 		end
 	end
@@ -142,16 +111,16 @@ function NpcServiceServer.RemoveNpcGroup(self: NpcServiceServer, GroupIdentifier
 end
 
 function NpcServiceServer.DestroyAll(self: NpcServiceServer): ()
-	for identifier, npc in self.CreatedNpcs do
+	for _, npc in self.CreatedNpcs do
 		npc:Destroy()
-		self.CreatedNpcs[identifier] = nil
 	end
-	for groupIdentifier, group in self.CreatedNpcGroups do
+	table.clear(self.CreatedNpcs)
+	for _, group in self.CreatedNpcGroups do
 		for _, npc in group do
 			npc:Destroy()
 		end
-		self.CreatedNpcGroups[groupIdentifier] = nil
 	end
+	table.clear(self.CreatedNpcGroups)
 end
 
 type NpcServiceServer = typeof(NpcServiceServer) & {

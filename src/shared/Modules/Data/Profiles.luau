@@ -1,6 +1,5 @@
 export type PropertyOverrides = {
 	HumanoidProperties: { [string]: any }?,
-	SpawnProperties: { [string]: any }?,
 	ActionProperties: { [string]: { [string]: any } }?,
 	BehaviourProperties: { [string]: any }?,
 }
@@ -9,10 +8,11 @@ export type Profile = {
 	Identifier: string,
 	Group: string,
 	Model: Model?,
-	HumanoidProperties: { [string]: any },
-	SpawnProperties: { [string]: any },
-	ActionProperties: { [string]: { [string]: any } },
-	BehaviourProperties: { [string]: any },
+	Properties: {
+		HumanoidProperties: { [string]: any },
+		ActionProperties: { [string]: { [string]: any } },
+		BehaviourProperties: { [string]: any },
+	},
 }
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -22,30 +22,17 @@ local Profiles = {
 			Identifier = "DefaultNPC",
 			Model = ReplicatedStorage.Assets.NpcModels:FindFirstChild("DefaultNPC_Model"),
 			Group = "DefaultNPC_Group",
-			HumanoidProperties = {
-				Health = 100,
-				MaxHealth = 100,
-				JumpPower = 60,
-				WalkSpeed = 16,
-				BreakJointsOnDeath = false,
-			},
-			SpawnProperties = {
-				CanBeSpawned = true,
-				SpawnDelay = 5,
-			},
-			ActionProperties = {
-				Jump = {
-					Enabled = true,
+			Properties = {
+				HumanoidProperties = {
+					Health = 100,
+					MaxHealth = 100,
+					JumpPower = 60,
+					WalkSpeed = 16,
+					BreakJointsOnDeath = false,
 				},
-				Move = {
-					Enabled = true,
-				},
-				Follow = {
-					Enabled = true,
-				},
+				ActionProperties = {},
+				BehaviourProperties = {},
 			},
-
-			BehaviourProperties = {},
 		},
 	},
 }
